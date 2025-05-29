@@ -8,6 +8,7 @@ FILE_URL = "https://github.com/N-sam-sn/OP/main/Result.csv"
 
 @st.cache_data
 def load_data():
+    FILE_URL = "https://github.com/N-sam-sn/OP/main/Result.csv"
     response = requests.get(FILE_URL)
     df = pd.read_csv(BytesIO(response.content))
     df.columns = df.columns.str.strip()
@@ -17,7 +18,8 @@ def load_data():
     df["% ВП"] = df["ВП"] / df["ВП План"].replace(0, pd.NA)
     return df
 
-df = load_data(FILE_URL )
+# ✅ Вызов функции без аргумента
+df = load_data()
 
 # === Заголовок ===
 st.title("📊 Дашборд по продажам")
