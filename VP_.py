@@ -44,7 +44,7 @@ def load_data():
 df = load_data()
 
 # === Заголовок ===
-st.title("📊 Дашборд по продажам")
+st.title("📊 Дашборд по продажам (по ширине экрана)")
 
 # === Фильтрация ===
 st.sidebar.header("🔎 Фильтрация")
@@ -56,42 +56,55 @@ def multiselect_with_all(label, options):
 
 filtered_df = df.copy()
 
-# Фильтр по Региону
 if "Регион" in filtered_df.columns:
     regions = sorted(filtered_df["Регион"].dropna().unique())
     region_selection = multiselect_with_all("Регион", regions)
     filtered_df = filtered_df[filtered_df["Регион"].isin(region_selection)]
 
-# Фильтр по Менеджеру
 if "Менеджер" in filtered_df.columns:
     managers = sorted(filtered_df["Менеджер"].dropna().unique())
     manager_selection = multiselect_with_all("Менеджер", managers)
     filtered_df = filtered_df[filtered_df["Менеджер"].isin(manager_selection)]
 
-# Фильтр по полю "Добавить в план"
 if "Добавить в план" in filtered_df.columns:
     plans = sorted(filtered_df["Добавить в план"].dropna().unique())
     plan_selection = multiselect_with_all("Добавить в план", plans)
     filtered_df = filtered_df[filtered_df["Добавить в план"].isin(plan_selection)]
 
-# Фильтр по Покупателю
 if "Покупатель" in filtered_df.columns:
     buyers = sorted(filtered_df["Покупатель"].dropna().unique())
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
-# === Отображение таблицы ===
+# === Таблица результатов ===
 st.subheader("📋 Результаты")
 
 display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
 available_cols = [col for col in display_columns if col in filtered_df.columns]
+df_result = filtered_df[available_cols].copy()
 
+# === Итоговая строка ===
+totals = {
+    "Менеджер": "ИТОГО",
+    "Покупатель": "",
+    "Код": "",
+    "ОП": df_result["ОП"].sum(),
+    "ОП План": df_result["ОП План"].sum(),
+    "% ОП": df_result["ОП"].sum() / df_result["ОП План"].sum() if df_result["ОП План"].sum() != 0 else None,
+    "ВП": df_result["ВП"].sum(),
+    "ВП План": df_result["ВП План"].sum(),
+    "% ВП": df_result["ВП"].sum() / df_result["ВП План"].sum() if df_result["ВП План"].sum() != 0 else None,
+}
+df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
+
+# === Подсветка процентов ===
 def highlight_percent(val):
     if pd.isna(val):
         return ""
     return "background-color: lightgreen" if val > 1 else "background-color: lightcoral" if val < 1 else ""
 
-styled_df = filtered_df[available_cols].style \
+# === Отображение с форматированием ===
+styled_df = df_result.style \
     .format({
         "ОП": "{:,.2f}",
         "ОП План": "{:,.2f}",
@@ -100,6 +113,6 @@ styled_df = filtered_df[available_cols].style \
         "ВП План": "{:,.2f}",
         "% ВП": "{:.0%}"
     }) \
-    .applymap(highlight_percent, subset=[col for col in ["% ОП", "% ВП"] if col in filtered_df.columns])
+    .applymap(highlight_percent, subset=["% ОП", "% ВП"])
 
 st.dataframe(styled_df, use_container_width=True)
