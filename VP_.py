@@ -3,7 +3,15 @@ import ipywidgets as widgets
 from IPython.display import display, HTML, clear_output
 
 # === Загрузка и подготовка данных ===
-file_path = r"D:\Work\Python\Dash_express\OP\Result.csv"
+FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.xlsx"
+
+@st.cache_data
+def load_data(url):
+    response = requests.get(url)
+    response.raise_for_status()  # Проверка ошибок
+    df = pd.read_excel(BytesIO(response.content))
+    df.columns = df.columns.str.strip()
+    return df
 df = pd.read_csv(file_path, sep=';', encoding='utf-8-sig', decimal=',')
 
 # Приведение чисел
