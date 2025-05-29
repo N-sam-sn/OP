@@ -47,23 +47,28 @@ df = load_data()
 st.title("📊 Дашборд по продажам (по ширине экрана)")
 
 # Увеличиваем ширину страницы
-st.markdown("""
-    <style>
-        .main, .block-container {
-            max-width: 2000px !important;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
-        .dataframe th, .dataframe td {
-            white-space: nowrap;
-            text-align: center;
-        }
-    </style>
+# Вставка таблицы вручную в HTML, задавая min-height
+from pandas.io.formats.style import Styler
+
+# Стилизация + ручная генерация HTML
+styled_html = df_result.style \
+    .format({
+        "ОП": "{:,.2f}",
+        "ОП План": "{:,.2f}",
+        "% ОП": "{:.0%}",
+        "ВП": "{:,.2f}",
+        "ВП План": "{:,.2f}",
+        "% ВП": "{:.0%}"
+    }) \
+    .applymap(highlight_percent, subset=["% ОП", "% ВП"]) \
+    .to_html()
+
+# Обёртка с максимальной высотой
+st.markdown(f"""
+    <div style="min-height: 90vh; overflow-x: auto;">
+        {styled_html}
+    </div>
 """, unsafe_allow_html=True)
-
-# В конце скрипта (после таблицы):
-st.markdown("<div style='height: 400px;'></div>", unsafe_allow_html=True)
-
 
 
 
