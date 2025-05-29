@@ -8,19 +8,34 @@ FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.csv"
 
 @st.cache_data
 def load_data():
-    response = requests.get(FILE_URL)
-    response.raise_for_status()  # на случай ошибки запроса
-    df = pd.read_csv(BytesIO(response.content))
+    url = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.csv"
+    response = requests.get(url)
+    response.raise_for_status()  # Поднимает исключение, если ошибка HTTP
+
+    try:
+        # Пробуем с autodetect
+        df = pd.read_csv(BytesIO(response.content), encoding="utf-8", sep=None, engine="python")
+    except Exception as e:
+        st.error(f"Ошибка при чтении CSV-файла: {e}")
+        st.stop()
+
     df.columns = df.columns.str.strip()
-    for col in ["ОП", "ОП План", "ВП", "ВП План"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-        else:
-            st.error(f"Столбец '{col}' не найден в файле.")
-            st.stop()
+
+    # Проверка наличия нужных колонок
+    required_cols = ["ОП", "ОП План", "ВП", "ВП План"]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        st.error(f"Отсутствуют необходимые колонки: {', '.join(missing)}")
+        st.stop()
+
+    for col in required_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
     df["% ОП"] = df["ОП"] / df["ОП План"].replace(0, pd.NA)
     df["% ВП"] = df["ВП"] / df["ВП План"].replace(0, pd.NA)
+
     return df
+
 
 df = load_data()
 
