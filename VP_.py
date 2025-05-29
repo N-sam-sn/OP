@@ -17,7 +17,7 @@ def load_data():
     df["% ВП"] = df["ВП"] / df["ВП План"].replace(0, pd.NA)
     return df
 
-df = load_data()
+df = load_data(FILE_URL )
 
 # === Заголовок ===
 st.title("📊 Дашборд по продажам")
