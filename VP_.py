@@ -34,10 +34,7 @@ def load_data():
 
     return df
 
-# === ЗАГРУЗКА ДАННЫХ ===
-df = load_data()
-
-# === СТИЛИ ДЛЯ ШИРИНЫ И ВЫСОТЫ ===
+# === СТИЛИ ДЛЯ ШИРИНЫ И ТАБЛИЦЫ ===
 st.markdown("""
     <style>
         .main, .block-container {
@@ -55,7 +52,10 @@ st.markdown("""
 # === ЗАГОЛОВОК ===
 st.title("📊 Дашборд по продажам")
 
-# === ФИЛЬТРАЦИЯ ===
+# === ЗАГРУЗКА ДАННЫХ ===
+df = load_data()
+
+# === ФИЛЬТРЫ ===
 st.sidebar.header("🔎 Фильтрация")
 
 def multiselect_with_all(label, options):
@@ -85,46 +85,47 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
-# === ФОРМИРУЕМ ТАБЛИЦУ ===
-display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
-df_result = filtered_df[display_columns].copy()
-
-# === ДОБАВЛЕНИЕ ИТОГОВ ===
-totals = {
-    "Менеджер": "ИТОГО",
-    "Покупатель": "",
-    "Код": "",
-    "ОП": df_result["ОП"].sum(),
-    "ОП План": df_result["ОП План"].sum(),
-    "% ОП": df_result["ОП"].sum() / df_result["ОП План"].sum() if df_result["ОП План"].sum() != 0 else None,
-    "ВП": df_result["ВП"].sum(),
-    "ВП План": df_result["ВП План"].sum(),
-    "% ВП": df_result["ВП"].sum() / df_result["ВП План"].sum() if df_result["ВП План"].sum() != 0 else None,
-}
-df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
-
 # === ПОДСВЕТКА ===
 def highlight_percent(val):
     if pd.isna(val):
         return ""
     return "background-color: lightgreen" if val > 1 else "background-color: lightcoral" if val < 1 else ""
 
-# === HTML-ТАБЛИЦА ДЛЯ РАСШИРЕННОЙ ВЫСОТЫ ===
-styled_html = df_result.style \
-    .format({
-        "ОП": "{:,.2f}",
-        "ОП План": "{:,.2f}",
-        "% ОП": "{:.0%}",
-        "ВП": "{:,.2f}",
-        "ВП План": "{:,.2f}",
-        "% ВП": "{:.0%}"
-    }) \
-    .applymap(highlight_percent, subset=["% ОП", "% ВП"]) \
-    .to_html()
+# === РЕНДЕРИНГ ТАБЛИЦЫ ===
+if not filtered_df.empty:
+    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
+    df_result = filtered_df[display_columns].copy()
 
-st.subheader("📋 Результаты")
-st.markdown(f"""
-    <div style="min-height: 90vh; overflow-x: auto;">
-        {styled_html}
-    </div>
-""", unsafe_allow_html=True)
+    totals = {
+        "Менеджер": "ИТОГО",
+        "Покупатель": "",
+        "Код": "",
+        "ОП": df_result["ОП"].sum(),
+        "ОП План": df_result["ОП План"].sum(),
+        "% ОП": df_result["ОП"].sum() / df_result["ОП План"].sum() if df_result["ОП План"].sum() != 0 else None,
+        "ВП": df_result["ВП"].sum(),
+        "ВП План": df_result["ВП План"].sum(),
+        "% ВП": df_result["ВП"].sum() / df_result["ВП План"].sum() if df_result["ВП План"].sum() != 0 else None,
+    }
+    df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
+
+    styled_html = df_result.style \
+        .format({
+            "ОП": "{:,.2f}",
+            "ОП План": "{:,.2f}",
+            "% ОП": "{:.0%}",
+            "ВП": "{:,.2f}",
+            "ВП План": "{:,.2f}",
+            "% ВП": "{:.0%}"
+        }) \
+        .applymap(highlight_percent, subset=["% ОП", "% ВП"]) \
+        .to_html()
+
+    st.subheader("📋 Результаты")
+    st.markdown(f"""
+        <div style="min-height: 90vh; overflow-x: auto;">
+            {styled_html}
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.warning("⚠️ Нет данных для отображения — проверьте настройки фильтрации.")
