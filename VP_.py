@@ -1,6 +1,10 @@
 import pandas as pd
 import ipywidgets as widgets
 from IPython.display import display, HTML, clear_output
+import plotly.graph_objects as go
+import streamlit as st
+import requests
+from io import BytesIO
 
 # === Загрузка и подготовка данных ===
 FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.xlsx"
@@ -9,10 +13,10 @@ FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.xlsx"
 def load_data(url):
     response = requests.get(url)
     response.raise_for_status()  # Проверка ошибок
-    df = pd.read_excel(BytesIO(response.content))
+    df = pd.read_csv((BytesIO(response.content), sep=';', encoding='utf-8-sig', decimal=',')
     df.columns = df.columns.str.strip()
     return df
-df = pd.read_csv(file_path, sep=';', encoding='utf-8-sig', decimal=',')
+df = load_data(FILE_URL) #pd.read_csv(file_path, sep=';', encoding='utf-8-sig', decimal=',')
 
 # Приведение чисел
 for col in ["ОП", "ОП План", "ВП", "ВП План"]:
