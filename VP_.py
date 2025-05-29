@@ -4,12 +4,12 @@ import requests
 from io import BytesIO
 
 # === Загрузка данных с GitHub ===
-FILE_URL = "https://github.com/N-sam-sn/OP/raw/main/Result.xlsx"
+FILE_URL = "https://github.com/N-sam-sn/OP/raw/main/Result.csv"
 
 @st.cache_data
 def load_data():
     response = requests.get(FILE_URL)
-    df = pd.read_excel(BytesIO(response.content))
+    df = pd.read_csv(BytesIO(response.content))
     df.columns = df.columns.str.strip()
     for col in ["ОП", "ОП План", "ВП", "ВП План"]:
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
