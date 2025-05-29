@@ -49,25 +49,18 @@ st.title("📊 Дашборд по продажам (по ширине экра�
 # Увеличиваем ширину страницы
 st.markdown("""
     <style>
-        .main {
-            max-width: 100%;
+        .main, .block-container {
+            max-width: 2000px !important;
             padding-left: 2rem;
             padding-right: 2rem;
         }
-        section.main > div {
-            max-width: 100vw;
-        }
-        .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            padding-left: 3rem;
-            padding-right: 3rem;
-        }
-        th, td {
+        .dataframe th, .dataframe td {
             white-space: nowrap;
+            text-align: center;
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 # === Фильтрация ===
 st.sidebar.header("🔎 Фильтрация")
