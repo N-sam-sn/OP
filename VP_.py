@@ -34,7 +34,7 @@ def load_data():
 
     return df
 
-# === СТИЛИ ДЛЯ ШИРИНЫ И ТАБЛИЦЫ ===
+# === CSS ДЛЯ ШИРОКОГО И УДЛИНЕННОГО ДАШБОРДА ===
 st.markdown("""
     <style>
         .main, .block-container {
@@ -85,11 +85,17 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
-# === ПОДСВЕТКА ===
-def highlight_percent(val):
-    if pd.isna(val):
-        return ""
-    return "background-color: lightgreen" if val > 1 else "background-color: lightcoral" if val < 1 else ""
+# === ФУНКЦИЯ ПОДСВЕТКИ (устойчивая) ===
+def highlight_percent_cols(df):
+    styles = pd.DataFrame("", index=df.index, columns=df.columns)
+    for col in ["% ОП", "% ВП"]:
+        if col in df.columns:
+            styles[col] = df[col].apply(
+                lambda v: "background-color: lightgreen" if v > 1
+                else "background-color: lightcoral" if v < 1
+                else ""
+            )
+    return styles
 
 # === РЕНДЕРИНГ ТАБЛИЦЫ ===
 if not filtered_df.empty:
@@ -118,7 +124,7 @@ if not filtered_df.empty:
             "ВП План": "{:,.2f}",
             "% ВП": "{:.0%}"
         }) \
-        .applymap(highlight_percent, subset=["% ОП", "% ВП"]) \
+        .apply(highlight_percent_cols, axis=None) \
         .to_html()
 
     st.subheader("📋 Результаты")
