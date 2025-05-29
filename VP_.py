@@ -1,95 +1,79 @@
-import pandas as pd
-import ipywidgets as widgets
-from IPython.display import display, HTML, clear_output
-import plotly.graph_objects as go
 import streamlit as st
+import pandas as pd
 import requests
 from io import BytesIO
 
-# === Загрузка и подготовка данных ===
-FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.xlsx"
+# === Загрузка данных с GitHub ===
+FILE_URL = "https://github.com/N-sam-sn/OP/raw/main/Result.xlsx"
 
 @st.cache_data
-def load_data(url):
-    response = requests.get(url)
-    response.raise_for_status()  # Проверка ошибок
-    df = pd.read_csv(BytesIO(response.content))#, sep=';', encoding='utf-8-sig', decimal=',')
+def load_data():
+    response = requests.get(FILE_URL)
+    df = pd.read_excel(BytesIO(response.content))
     df.columns = df.columns.str.strip()
+    for col in ["ОП", "ОП План", "ВП", "ВП План"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    df["% ОП"] = df["ОП"] / df["ОП План"].replace(0, pd.NA)
+    df["% ВП"] = df["ВП"] / df["ВП План"].replace(0, pd.NA)
     return df
-df = load_data(FILE_URL) #pd.read_csv(file_path, sep=';', encoding='utf-8-sig', decimal=',')
 
-# Приведение чисел
-for col in ["ОП", "ОП План", "ВП", "ВП План"]:
-    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+df = load_data()
 
-# Расчёт дополнительных столбцов
-df["% ОП"] = df["ОП"] / df["ОП План"].replace(0, pd.NA)
-df["% ВП"] = df["ВП"] / df["ВП План"].replace(0, pd.NA)
+# === Заголовок ===
+st.title("📊 Дашборд по продажам")
 
 # === Фильтры ===
-def dropdown(column_name):
-    return widgets.Dropdown(
-        options=["Все"] + sorted(df[column_name].dropna().unique().tolist()),
-        value="Все",
-        description=column_name + ":",
-        layout=widgets.Layout(width="300px")
-    )
+st.sidebar.header("🔎 Фильтрация")
 
-region_filter = dropdown("Регион")
-plan_filter = dropdown("Добавить в план")
-manager_filter = dropdown("Менеджер")
-buyer_filter = dropdown("Покупатель")
+def multiselect_with_all(label, options):
+    all_label = "Все"
+    selected = st.sidebar.multiselect(label, [all_label] + options, default=all_label)
+    if all_label in selected:
+        return options
+    return selected
 
-# === Подсветка ===
-def highlight_cells(val):
+regions = sorted(df["Регион"].dropna().unique())
+region_selection = multiselect_with_all("Регион", regions)
+
+filtered_df = df[df["Регион"].isin(region_selection)]
+
+managers = sorted(filtered_df["Менеджер"].dropna().unique())
+manager_selection = multiselect_with_all("Менеджер", managers)
+
+filtered_df = filtered_df[filtered_df["Менеджер"].isin(manager_selection)]
+
+plans = sorted(filtered_df["Добавить в план"].dropna().unique())
+plan_selection = multiselect_with_all("Добавить в план", plans)
+
+filtered_df = filtered_df[filtered_df["Добавить в план"].isin(plan_selection)]
+
+buyers = sorted(filtered_df["Покупатель"].dropna().unique())
+buyer_selection = multiselect_with_all("Покупатель", buyers)
+
+filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
+
+# === Таблица результатов ===
+st.subheader("📋 Результаты")
+display_cols = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
+
+def highlight_percent(val):
     if pd.isna(val):
-        return ''
+        return ""
     if val > 1:
-        return 'background-color: lightgreen'
+        return "background-color: lightgreen"
     elif val < 1:
-        return 'background-color: lightcoral'
-    return ''
+        return "background-color: lightcoral"
+    return ""
 
-# === Основная функция отображения ===
-def update_dashboard(change=None):
-    clear_output(wait=True)
-    
-    # Фильтрация
-    dff = df.copy()
-    if region_filter.value != "Все":
-        dff = dff[dff["Регион"] == region_filter.value]
-    if plan_filter.value != "Все":
-        dff = dff[dff["Добавить в план"] == plan_filter.value]
-    if manager_filter.value != "Все":
-        dff = dff[dff["Менеджер"] == manager_filter.value]
-    if buyer_filter.value != "Все":
-        dff = dff[dff["Покупатель"] == buyer_filter.value]
+styled_df = filtered_df[display_cols].style \
+    .format({
+        "ОП": "{:,.2f}",
+        "ОП План": "{:,.2f}",
+        "% ОП": "{:.0%}",
+        "ВП": "{:,.2f}",
+        "ВП План": "{:,.2f}",
+        "% ВП": "{:.0%}"
+    }) \
+    .applymap(highlight_percent, subset=["% ОП", "% ВП"])
 
-    # Вывод фильтров
-    display(HTML("<h2>📊 Интерактивный дашборд по продажам</h2>"))
-    display(widgets.HBox([region_filter, plan_filter, manager_filter, buyer_filter]))
-
-    # Отображаем таблицу
-    display_cols = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
-    styled_df = dff[display_cols].style \
-        .format({
-            "ОП": "{:,.2f}",
-            "ОП План": "{:,.2f}",
-            "% ОП": "{:.0%}",
-            "ВП": "{:,.2f}",
-            "ВП План": "{:,.2f}",
-            "% ВП": "{:.0%}"
-        }) \
-        .applymap(highlight_cells, subset=["% ОП", "% ВП"])
-    
-    display(HTML("<br><h4>📋 Таблица результатов</h4>"))
-    display(styled_df)
-
-# === Привязка изменений ===
-region_filter.observe(update_dashboard, names='value')
-plan_filter.observe(update_dashboard, names='value')
-manager_filter.observe(update_dashboard, names='value')
-buyer_filter.observe(update_dashboard, names='value')
-
-# === Инициализация дашборда ===
-update_dashboard()
+st.dataframe(styled_df, use_container_width=True)
