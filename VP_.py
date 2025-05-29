@@ -10,13 +10,7 @@ FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.csv"
 def load_data():
     response = requests.get(FILE_URL)
     response.raise_for_status()
-
-    try:
-        df = pd.read_csv(BytesIO(response.content), encoding="utf-8-sig", sep=";")
-    except Exception as e:
-        st.error(f"Ошибка при чтении CSV: {e}")
-        st.stop()
-
+    df = pd.read_csv(BytesIO(response.content), encoding="utf-8-sig", sep=";")
     df.columns = df.columns.str.replace('\ufeff', '').str.strip()
 
     def clean_number(x):
@@ -24,8 +18,7 @@ def load_data():
             return None
         return str(x).replace(" ", "").replace(",", ".").replace("–", "0").strip()
 
-    numeric_cols = ["ОП", "ОП План", "ВП", "ВП План"]
-    for col in numeric_cols:
+    for col in ["ОП", "ОП План", "ВП", "ВП План"]:
         df[col] = df[col].apply(clean_number)
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -41,38 +34,28 @@ def load_data():
 
     return df
 
+# === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
 
-# === Заголовок ===
-st.title("📊 Дашборд по продажам (по ширине экрана)")
-
-# Увеличиваем ширину страницы
-# Вставка таблицы вручную в HTML, задавая min-height
-from pandas.io.formats.style import Styler
-
-# Стилизация + ручная генерация HTML
-styled_html = df_result.style \
-    .format({
-        "ОП": "{:,.2f}",
-        "ОП План": "{:,.2f}",
-        "% ОП": "{:.0%}",
-        "ВП": "{:,.2f}",
-        "ВП План": "{:,.2f}",
-        "% ВП": "{:.0%}"
-    }) \
-    .applymap(highlight_percent, subset=["% ОП", "% ВП"]) \
-    .to_html()
-
-# Обёртка с максимальной высотой
-st.markdown(f"""
-    <div style="min-height: 90vh; overflow-x: auto;">
-        {styled_html}
-    </div>
+# === СТИЛИ ДЛЯ ШИРИНЫ И ВЫСОТЫ ===
+st.markdown("""
+    <style>
+        .main, .block-container {
+            max-width: 2000px !important;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        .dataframe th, .dataframe td {
+            white-space: nowrap;
+            text-align: center;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
+# === ЗАГОЛОВОК ===
+st.title("📊 Дашборд по продажам")
 
-
-# === Фильтрация ===
+# === ФИЛЬТРАЦИЯ ===
 st.sidebar.header("🔎 Фильтрация")
 
 def multiselect_with_all(label, options):
@@ -102,14 +85,11 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
-# === Таблица результатов ===
-st.subheader("📋 Результаты")
-
+# === ФОРМИРУЕМ ТАБЛИЦУ ===
 display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
-available_cols = [col for col in display_columns if col in filtered_df.columns]
-df_result = filtered_df[available_cols].copy()
+df_result = filtered_df[display_columns].copy()
 
-# === Итоговая строка ===
+# === ДОБАВЛЕНИЕ ИТОГОВ ===
 totals = {
     "Менеджер": "ИТОГО",
     "Покупатель": "",
@@ -123,14 +103,14 @@ totals = {
 }
 df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
-# === Подсветка процентов ===
+# === ПОДСВЕТКА ===
 def highlight_percent(val):
     if pd.isna(val):
         return ""
     return "background-color: lightgreen" if val > 1 else "background-color: lightcoral" if val < 1 else ""
 
-# === Отображение с форматированием ===
-styled_df = df_result.style \
+# === HTML-ТАБЛИЦА ДЛЯ РАСШИРЕННОЙ ВЫСОТЫ ===
+styled_html = df_result.style \
     .format({
         "ОП": "{:,.2f}",
         "ОП План": "{:,.2f}",
@@ -139,6 +119,12 @@ styled_df = df_result.style \
         "ВП План": "{:,.2f}",
         "% ВП": "{:.0%}"
     }) \
-    .applymap(highlight_percent, subset=["% ОП", "% ВП"])
+    .applymap(highlight_percent, subset=["% ОП", "% ВП"]) \
+    .to_html()
 
-st.dataframe(styled_df, use_container_width=True)
+st.subheader("📋 Результаты")
+st.markdown(f"""
+    <div style="min-height: 90vh; overflow-x: auto;">
+        {styled_html}
+    </div>
+""", unsafe_allow_html=True)
