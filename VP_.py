@@ -4,7 +4,7 @@ import requests
 from io import BytesIO
 
 # === Загрузка данных с GitHub ===
-FILE_URL = "https://github.com/N-sam-sn/OP/blob/main/Result.csv"
+FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/refs/heads/main/Result.csv"
 
 @st.cache_data
 def load_data():
