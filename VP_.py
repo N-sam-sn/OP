@@ -51,15 +51,21 @@ st.markdown("""
     <style>
         .main, .block-container {
             max-width: 2000px !important;
+            min-height: 100vh;
             padding-left: 2rem;
             padding-right: 2rem;
+            padding-bottom: 5rem;
         }
         .dataframe th, .dataframe td {
             white-space: nowrap;
             text-align: center;
         }
+        html, body, [data-testid="stAppViewContainer"] {
+            height: 100%;
+        }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 # === Фильтрация ===
