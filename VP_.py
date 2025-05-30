@@ -120,6 +120,10 @@ if not filtered_df.empty:
     total_op_plan = df_result["ОП План"].sum()
     total_vp = df_result["ВП"].sum()
     total_vp_plan = df_result["ВП План"].sum()
+    total_pg = df_result["ОП_ПГ"].sum()
+
+    percent_op_total = total_op / total_op_plan if total_op_plan else None
+    percent_vp_total = total_vp / total_vp_plan if total_vp_plan else None
 
     totals = {
         "Менеджер": "ИТОГО",
@@ -127,14 +131,30 @@ if not filtered_df.empty:
         "Код": "",
         "ОП": total_op,
         "ОП План": total_op_plan,
-        "% ОП": total_op / total_op_plan if total_op_plan != 0 else None,
+        "% ОП": percent_op_total,
         "ВП": total_vp,
         "ВП План": total_vp_plan,
-        "% ВП": total_vp / total_vp_plan if total_vp_plan != 0 else None,
-        "ОП_ПГ": df_result["ОП_ПГ"].sum()
+        "% ВП": percent_vp_total,
+        "ОП_ПГ": total_pg
     }
 
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
+
+    # === ЗАГОЛОВОК С ИТОГАМИ ===
+    st.subheader("📋 Результаты")
+    st.markdown(
+        f"""
+        **Итоги:**  
+        ОП: {total_op:,.2f} |  
+        ОП План: {total_op_plan:,.2f} |  
+        % ОП: {percent_op_total:.0%} |  
+        ВП: {total_vp:,.2f} |  
+        ВП План: {total_vp_plan:,.2f} |  
+        % ВП: {percent_vp_total:.0%} |  
+        ОП_ПГ: {total_pg:,.2f}
+        """,
+        unsafe_allow_html=False
+    )
 
     styled_html = df_result.style \
         .format({
@@ -149,7 +169,6 @@ if not filtered_df.empty:
         .apply(highlight_percent_cols, axis=None) \
         .to_html()
 
-    st.subheader("📋 Результаты")
     st.markdown(f"""
         <div class="scrollable-table-container">
             {styled_html}
