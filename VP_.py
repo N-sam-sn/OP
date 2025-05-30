@@ -64,8 +64,8 @@ st.markdown("""
 
 # === ЗАГОЛОВОК ===
 
-saved_emoji = pygame.image.load("https://github.com/N-sam-sn/OP/blob/main/B01r.png")
-screen.blit(saved_emoji, (100, 100))
+#saved_emoji = pygame.image.load("https://github.com/N-sam-sn/OP/blob/main/B01r.png")
+#screen.blit(saved_emoji, (100, 100))
 st.title("📊 Дашборд по продажам")
 
 # === ЗАГРУЗКА ДАННЫХ ===
