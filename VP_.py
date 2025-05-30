@@ -115,18 +115,25 @@ if not filtered_df.empty:
     display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
 
+    # Подсчёт итогов
+    total_op = df_result["ОП"].sum()
+    total_op_plan = df_result["ОП План"].sum()
+    total_vp = df_result["ВП"].sum()
+    total_vp_plan = df_result["ВП План"].sum()
+
     totals = {
         "Менеджер": "ИТОГО",
         "Покупатель": "",
         "Код": "",
-        "ОП": df_result["ОП"].sum(),
-        "ОП План": df_result["ОП План"].sum(),
-        "% ОП": df_result["ОП"].sum() / df_result["ОП План"].sum() if df_result["ОП План"].sum() != 0 else None,
-        "ВП": df_result["ВП"].sum(),
-        "ВП План": df_result["ВП План"].sum(),
-        "% ВП": df_result["ВП"].sum() / df_result["ВП План"].sum() if df_result["ВП План"].sum() != 0 else None,
+        "ОП": total_op,
+        "ОП План": total_op_plan,
+        "% ОП": total_op / total_op_plan if total_op_plan != 0 else None,
+        "ВП": total_vp,
+        "ВП План": total_vp_plan,
+        "% ВП": total_vp / total_vp_plan if total_vp_plan != 0 else None,
         "ОП_ПГ": df_result["ОП_ПГ"].sum()
     }
+
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
     styled_html = df_result.style \
