@@ -104,8 +104,8 @@ def highlight_percent_cols(df):
     for col in ["% ОП", "% ВП"]:
         if col in df.columns:
             styles[col] = df[col].apply(
-                lambda v: "background-color: lightgreen" if pd.notna(v) and v >= 1
-                else "background-color: lightcoral" if pd.notna(v) and v < 1
+                lambda v: "background-color: lightgreen" if v > 1
+                else "background-color: lightcoral" if v < 1
                 else ""
             )
     return styles
@@ -140,21 +140,29 @@ if not filtered_df.empty:
 
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
-    # === ЗАГОЛОВОК С ИТОГАМИ ===
+    # === ЗАГОЛОВОК С ИТОГАМИ В СТРОКУ + ЗАЛИВКА ===
+    color_op = "lightgreen" if percent_op_total >= 1 else "lightcoral"
+    color_vp = "lightgreen" if percent_vp_total >= 1 else "lightcoral"
+
+    summary_html = f"""
+        <div style="font-weight:bold; margin-top:1em;">
+            Итоги: &nbsp;
+            ОП: {total_op:,.2f} &nbsp; | &nbsp;
+            ОП План: {total_op_plan:,.2f} &nbsp; | &nbsp;
+            <span style="background-color:{color_op}; padding: 2px 6px; border-radius: 4px;">
+                % ОП: {percent_op_total:.0%}
+            </span> &nbsp; | &nbsp;
+            ВП: {total_vp:,.2f} &nbsp; | &nbsp;
+            ВП План: {total_vp_plan:,.2f} &nbsp; | &nbsp;
+            <span style="background-color:{color_vp}; padding: 2px 6px; border-radius: 4px;">
+                % ВП: {percent_vp_total:.0%}
+            </span> &nbsp; | &nbsp;
+            ОП_ПГ: {total_pg:,.2f}
+        </div>
+    """
+
     st.subheader("📋 Результаты")
-    st.markdown(
-        f"""
-        **Итоги:**  
-        ОП: {total_op:,.2f} |  
-        ОП План: {total_op_plan:,.2f} |  
-        % ОП: {percent_op_total:.0%} |  
-        ВП: {total_vp:,.2f} |  
-        ВП План: {total_vp_plan:,.2f} |  
-        % ВП: {percent_vp_total:.0%} |  
-        ОП_ПГ: {total_pg:,.2f}
-        """,
-        unsafe_allow_html=False
-    )
+    st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
         .format({
