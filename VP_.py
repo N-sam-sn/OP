@@ -18,9 +18,10 @@ def load_data():
             return None
         return str(x).replace(" ", "").replace(",", ".").replace("–", "0").strip()
 
-    for col in ["ОП", "ОП План", "ВП", "ВП План"]:
-        df[col] = df[col].apply(clean_number)
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+    for col in ["ОП", "ОП План", "ВП", "ВП План", "ОП_ПГ"]:
+        if col in df.columns:
+            df[col] = df[col].apply(clean_number)
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
     df = df[
         (df["ОП"] > 0) |
@@ -34,7 +35,7 @@ def load_data():
 
     return df
 
-# === CSS ДЛЯ ШИРОКОГО И УДЛИНЕННОГО ДАШБОРДА ===
+# === CSS ДЛЯ ШИРОКОГО ДАШБОРДА ===
 st.markdown("""
     <style>
         .main, .block-container {
@@ -49,10 +50,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# === ЗАГОЛОВОК ===
 st.title("📊 Дашборд по продажам")
 
-# === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
 
 # === ФИЛЬТРЫ ===
@@ -85,7 +84,7 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
-# === ФУНКЦИЯ ПОДСВЕТКИ (устойчивая) ===
+# === ПОДСВЕТКА ПРОЦЕНТОВ ===
 def highlight_percent_cols(df):
     styles = pd.DataFrame("", index=df.index, columns=df.columns)
     for col in ["% ОП", "% ВП"]:
@@ -97,9 +96,9 @@ def highlight_percent_cols(df):
             )
     return styles
 
-# === РЕНДЕРИНГ ТАБЛИЦЫ ===
+# === ОТОБРАЖЕНИЕ ТАБЛИЦЫ ===
 if not filtered_df.empty:
-    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП"]
+    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
 
     totals = {
@@ -112,6 +111,7 @@ if not filtered_df.empty:
         "ВП": df_result["ВП"].sum(),
         "ВП План": df_result["ВП План"].sum(),
         "% ВП": df_result["ВП"].sum() / df_result["ВП План"].sum() if df_result["ВП План"].sum() != 0 else None,
+        "ОП_ПГ": df_result["ОП_ПГ"].sum()
     }
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
@@ -122,7 +122,8 @@ if not filtered_df.empty:
             "% ОП": "{:.0%}",
             "ВП": "{:,.2f}",
             "ВП План": "{:,.2f}",
-            "% ВП": "{:.0%}"
+            "% ВП": "{:.0%}",
+            "ОП_ПГ": "{:,.2f}"
         }) \
         .apply(highlight_percent_cols, axis=None) \
         .to_html()
