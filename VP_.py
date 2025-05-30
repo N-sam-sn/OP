@@ -104,8 +104,8 @@ def highlight_percent_cols(df):
     for col in ["% ОП", "% ВП"]:
         if col in df.columns:
             styles[col] = df[col].apply(
-                lambda v: "background-color: lightgreen" if v > 1
-                else "background-color: lightcoral" if v < 1
+                lambda v: "background-color: lightgreen" if pd.notna(v) and v >= 1
+                else "background-color: lightcoral" if pd.notna(v) and v < 1
                 else ""
             )
     return styles
