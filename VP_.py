@@ -64,7 +64,7 @@ st.markdown("""
 
 # === ЗАГОЛОВОК ===
 
-EMOJI_URL = "https://raw.githubusercontent.com/N-sam-sn/N/main/B02r.png" # EMOJI_URL ="https://github.com/N-sam-sn/N/blob/main/dash02.py" #"https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png"
+EMOJI_URL = "https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png" # EMOJI_URL ="https://github.com/N-sam-sn/N/blob/main/dash02.py" #"https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png"
 st.image(EMOJI_URL,  width=200)
 
 st.title("📊 Дашборд по продажам")
