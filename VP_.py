@@ -114,11 +114,12 @@ def highlight_percent_cols(df):
 if not filtered_df.empty:
     display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
+    df_result.rename(columns={"ОП": "ОП Факт", "ВП": "ВП Факт"}, inplace=True)
 
     # Подсчёт итогов
-    total_op = df_result["ОП"].sum()
+    total_op = df_result["ОП Факт"].sum()
     total_op_plan = df_result["ОП План"].sum()
-    total_vp = df_result["ВП"].sum()
+    total_vp = df_result["ВП Факт"].sum()
     total_vp_plan = df_result["ВП План"].sum()
     total_pg = df_result["ОП_ПГ"].sum()
 
@@ -129,10 +130,10 @@ if not filtered_df.empty:
         "Менеджер": "ИТОГО",
         "Покупатель": "",
         "Код": "",
-        "ОП": total_op,
+        "ОП Факт": total_op,
         "ОП План": total_op_plan,
         "% ОП": percent_op_total,
-        "ВП": total_vp,
+        "ВП Факт": total_vp,
         "ВП План": total_vp_plan,
         "% ВП": percent_vp_total,
         "ОП_ПГ": total_pg
@@ -147,12 +148,12 @@ if not filtered_df.empty:
     summary_html = f"""
         <div style="font-weight:bold; margin-top:1em;">
             Итоги: &nbsp;
-            ОП: {total_op:,.2f} &nbsp; | &nbsp;
+            ОП Факт: {total_op:,.2f} &nbsp; | &nbsp;
             ОП План: {total_op_plan:,.2f} &nbsp; | &nbsp;
             <span style="background-color:{color_op}; padding: 2px 6px; border-radius: 4px;">
                 % ОП: {percent_op_total:.0%}
             </span> &nbsp; | &nbsp;
-            ВП: {total_vp:,.2f} &nbsp; | &nbsp;
+            ВП Факт: {total_vp:,.2f} &nbsp; | &nbsp;
             ВП План: {total_vp_plan:,.2f} &nbsp; | &nbsp;
             <span style="background-color:{color_vp}; padding: 2px 6px; border-radius: 4px;">
                 % ВП: {percent_vp_total:.0%}
@@ -166,10 +167,10 @@ if not filtered_df.empty:
 
     styled_html = df_result.style \
         .format({
-            "ОП": "{:,.2f}",
+            "ОП Факт": "{:,.2f}",
             "ОП План": "{:,.2f}",
             "% ОП": "{:.0%}",
-            "ВП": "{:,.2f}",
+            "ВП Факт": "{:,.2f}",
             "ВП План": "{:,.2f}",
             "% ВП": "{:.0%}",
             "ОП_ПГ": "{:,.2f}"
