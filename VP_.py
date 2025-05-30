@@ -129,10 +129,10 @@ if not filtered_df.empty:
         "Менеджер": "ИТОГО",
         "Покупатель": "",
         "Код": "",
-        "ОП Факт": total_op,
+        "ОП": total_op,
         "ОП План": total_op_plan,
         "% ОП": percent_op_total,
-        "ВП Факт": total_vp,
+        "ВП": total_vp,
         "ВП План": total_vp_plan,
         "% ВП": percent_vp_total,
         "ОП_ПГ": total_pg
