@@ -35,7 +35,7 @@ def load_data():
 
     return df
 
-# === CSS ДЛЯ ШИРОКОГО ДАШБОРДА ===
+# === CSS ===
 st.markdown("""
     <style>
         .main, .block-container {
@@ -47,11 +47,25 @@ st.markdown("""
             white-space: nowrap;
             text-align: center;
         }
+        .scrollable-table-container {
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+        .scrollable-table-container table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f1f1f1;
+            z-index: 1;
+        }
     </style>
 """, unsafe_allow_html=True)
 
+# === ЗАГОЛОВОК ===
 st.title("📊 Дашборд по продажам")
 
+# === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
 
 # === ФИЛЬТРЫ ===
@@ -96,7 +110,7 @@ def highlight_percent_cols(df):
             )
     return styles
 
-# === ОТОБРАЖЕНИЕ ТАБЛИЦЫ ===
+# === ТАБЛИЦА ===
 if not filtered_df.empty:
     display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
@@ -130,7 +144,7 @@ if not filtered_df.empty:
 
     st.subheader("📋 Результаты")
     st.markdown(f"""
-        <div style="min-height: 90vh; overflow-x: auto;">
+        <div class="scrollable-table-container">
             {styled_html}
         </div>
     """, unsafe_allow_html=True)
