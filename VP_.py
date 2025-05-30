@@ -112,7 +112,7 @@ def highlight_percent_cols(df):
 
 # === ТАБЛИЦА ===
 if not filtered_df.empty:
-    display_columns = ["Менеджер", "Покупатель", "Код", "ОП  Факт", "ОП План", "% ОП", "ВП Факт", "ВП План", "% ВП", "ОП_ПГ"]
+    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
 
     # Подсчёт итогов
