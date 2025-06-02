@@ -67,7 +67,7 @@ st.markdown("""
 EMOJI_URL = "https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png" # EMOJI_URL ="https://github.com/N-sam-sn/N/blob/main/dash02.py" #"https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png"
 #st.image(EMOJI_URL,  width=100)+
 
-st.title("📊 Дашборд по продажам")
+st.title("📊 Дашборд по продажам мая 2025")
 
 # === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
