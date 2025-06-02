@@ -115,6 +115,24 @@ def highlight_percent_cols(df):
     return styles
 
 # === ТАБЛИЦА ===
+
+# Получение даты обновления CSV-файла с GitHub (по заголовку Last-Modified)
+import datetime
+
+@st.cache_data
+def get_file_update_date():
+    try:
+        head = requests.head(FILE_URL)
+        last_modified = head.headers.get("Last-Modified", "")
+        if last_modified:
+            dt = datetime.datetime.strptime(last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+            return dt.strftime("%d.%m.%Y")
+    except Exception:
+        pass
+    return "неизвестна"
+
+update_date = get_file_update_date()
+
 if not filtered_df.empty:
     display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
@@ -166,7 +184,7 @@ if not filtered_df.empty:
         </div>
     """
 
-    st.subheader("📋 Результаты")
+    st.markdown(f"### 📋 Результаты на {update_date}")
     st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
