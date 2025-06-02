@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 from io import BytesIO
+import datetime
 
 # === ССЫЛКА НА CSV ===
 FILE_URL = "https://raw.githubusercontent.com/N-sam-sn/OP/main/Result.csv"
@@ -165,8 +166,20 @@ if not filtered_df.empty:
             ОП_ПГ: {total_pg:,.2f}
         </div>
     """
-
-    st.subheader("📋 Результаты на 31.05.2025")
+@st.cache_data
+def get_file_update_date():
+    try:
+        head = requests.head(FILE_URL)
+        last_modified = head.headers.get("Last-Modified", "")
+        if last_modified:
+            dt = datetime.datetime.strptime(last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+            return dt.strftime("%d.%m.%Y")
+    except Exception:
+        pass
+    return "неизвестна"
+update_date = get_file_update_date()
+    
+    st.subheader("📋 Результаты на {update_date}) #31.05.2025")
     st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
