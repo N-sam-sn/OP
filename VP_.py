@@ -67,7 +67,7 @@ st.markdown("""
 EMOJI_URL = "https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png" # EMOJI_URL ="https://github.com/N-sam-sn/N/blob/main/dash02.py" #"https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png"
 #st.image(EMOJI_URL,  width=100)+
 
-st.title("📊 Дашборд по продажам мая 2025")
+st.title("📊 Дашборд по продажам июня 2025")
 
 # === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
@@ -166,7 +166,7 @@ if not filtered_df.empty:
         </div>
     """
 
-    st.subheader("📋 Результаты на 31.05.2025")
+    st.subheader("📋 Результаты на 04.06.2025")
     st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
