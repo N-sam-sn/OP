@@ -30,8 +30,8 @@ def load_data():
         (df["ВП План"] > 0)
     ].copy()
 
-    df["% ОП"] = df.apply(lambda row: row["ОП"] / row["ОП План"] if row["ОП План"] != 0 else None, axis=1)
-    df["% ВП"] = df.apply(lambda row: row["ВП"] / row["ВП План"] if row["ВП План"] != 0 else None, axis=1)
+    df["% ОП"] = df.apply(lambda row: row["ОП"] / row["ОП План"] if row["ОП План"] else None, axis=1)
+    df["% ВП"] = df.apply(lambda row: row["ВП"] / row["ВП План"] if row["ВП План"] else None, axis=1)
 
     return df
 
@@ -63,10 +63,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === ЗАГОЛОВОК ===
-
-EMOJI_URL = "https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png" # EMOJI_URL ="https://github.com/N-sam-sn/N/blob/main/dash02.py" #"https://raw.githubusercontent.com/N-sam-sn/N/main/B01r.png"
-#st.image(EMOJI_URL,  width=100)+
-
 st.title("📊 Дашборд по продажам июня 2025")
 
 # === ЗАГРУЗКА ДАННЫХ ===
@@ -130,6 +126,12 @@ if not filtered_df.empty:
     percent_op_total = total_op / total_op_plan if total_op_plan else None
     percent_vp_total = total_vp / total_vp_plan if total_vp_plan else None
 
+    percent_op_str = f"{percent_op_total:.0%}" if percent_op_total is not None else "—"
+    percent_vp_str = f"{percent_vp_total:.0%}" if percent_vp_total is not None else "—"
+
+    color_op = "lightgreen" if percent_op_total is not None and percent_op_total >= 1 else "lightcoral"
+    color_vp = "lightgreen" if percent_vp_total is not None and percent_vp_total >= 1 else "lightcoral"
+
     totals = {
         "Менеджер": "ИТОГО",
         "Покупатель": "",
@@ -145,33 +147,26 @@ if not filtered_df.empty:
 
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
-    # === ЗАГОЛОВОК С ИТОГАМИ В СТРОКУ + ЗАЛИВКА ===
-percent_op_str = f"{percent_op_total:.0%}" if percent_op_total is not None else "—"
-percent_vp_str = f"{percent_vp_total:.0%}" if percent_vp_total is not None else "—"
+    # === ЗАГОЛОВОК С ИТОГАМИ ===
+    st.subheader("📋 Результаты на 04.06.2025")
 
-color_op = "lightgreen" if percent_op_total is not None and percent_op_total >= 1 else "lightcoral"
-color_vp = "lightgreen" if percent_vp_total is not None and percent_vp_total >= 1 else "lightcoral"
-
-summary_html = f"""
-    <div style="font-weight:bold; margin-top:1em;">
-        Итоги: &nbsp;
-        ОП Факт: {total_op:,.2f} &nbsp; | &nbsp;
-        ОП План: {total_op_plan:,.2f} &nbsp; | &nbsp;
-        <span style="background-color:{color_op}; padding: 2px 6px; border-radius: 4px;">
-            % ОП: {percent_op_str}
-        </span> &nbsp; | &nbsp;
-        ВП Факт: {total_vp:,.2f} &nbsp; | &nbsp;
-        ВП План: {total_vp_plan:,.2f} &nbsp; | &nbsp;
-        <span style="background-color:{color_vp}; padding: 2px 6px; border-radius: 4px;">
-            % ВП: {percent_vp_str}
-        </span> &nbsp; | &nbsp;
-        ОП_ПГ: {total_pg:,.2f}
-    </div>
-"""
-
-st.subheader("📋 Результаты на 04.06.2025")
-st.markdown(summary_html, unsafe_allow_html=True)
-
+    summary_html = f"""
+        <div style="font-weight:bold; margin-top:1em;">
+            Итоги: &nbsp;
+            ОП Факт: {total_op:,.2f} &nbsp; | &nbsp;
+            ОП План: {total_op_plan:,.2f} &nbsp; | &nbsp;
+            <span style="background-color:{color_op}; padding: 2px 6px; border-radius: 4px;">
+                % ОП: {percent_op_str}
+            </span> &nbsp; | &nbsp;
+            ВП Факт: {total_vp:,.2f} &nbsp; | &nbsp;
+            ВП План: {total_vp_plan:,.2f} &nbsp; | &nbsp;
+            <span style="background-color:{color_vp}; padding: 2px 6px; border-radius: 4px;">
+                % ВП: {percent_vp_str}
+            </span> &nbsp; | &nbsp;
+            ОП_ПГ: {total_pg:,.2f}
+        </div>
+    """
+    st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
         .format({
