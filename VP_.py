@@ -30,8 +30,8 @@ def load_data():
         (df["ВП План"] > 0)
     ].copy()
 
-    df["% ОП"] = df.apply(lambda row: row["ОП"] / row["ОП План"] if row["ОП План"] != 0 else None, axis=1)
-    df["% ВП"] = df.apply(lambda row: row["ВП"] / row["ВП План"] if row["ВП План"] != 0 else None, axis=1)
+    df["% ОП"] = df.apply(lambda row: row["ОП"] / row["ОП План"] if row["ОП План"] else None, axis=1)
+    df["% ВП"] = df.apply(lambda row: row["ВП"] / row["ВП План"] if row["ВП План"] else None, axis=1)
 
     return df
 
@@ -104,14 +104,18 @@ def highlight_percent_cols(df):
     for col in ["% ОП", "% ВП"]:
         if col in df.columns:
             styles[col] = df[col].apply(
-                lambda v: (
-                    "background-color: lightgreen" if pd.notna(v) and v > 1
-                    else "background-color: lightcoral" if pd.notna(v) and v < 1
-                    else ""
-                )
+                lambda v: "background-color: lightgreen" if pd.notna(v) and v > 1
+                else "background-color: lightcoral" if pd.notna(v) and v < 1
+                else ""
             )
     return styles
 
+# === ФОРМАТИРУЮЩИЕ ФУНКЦИИ ===
+def safe_percent(x):
+    return "{:.0%}".format(x) if pd.notna(x) else ""
+
+def safe_number(x):
+    return "{:,.2f}".format(x) if pd.notna(x) else ""
 
 # === ТАБЛИЦА ===
 if not filtered_df.empty:
@@ -126,8 +130,8 @@ if not filtered_df.empty:
     total_vp_plan = df_result["ВП План"].sum()
     total_pg = df_result["ОП_ПГ"].sum()
 
-    percent_op_total = total_op / total_op_plan if total_op_plan else 0
-    percent_vp_total = total_vp / total_vp_plan if total_vp_plan else 0
+    percent_op_total = total_op / total_op_plan if total_op_plan else None
+    percent_vp_total = total_vp / total_vp_plan if total_vp_plan else None
 
     totals = {
         "Менеджер": "ИТОГО",
@@ -144,53 +148,48 @@ if not filtered_df.empty:
 
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
-    # === ЗАГОЛОВОК С ИТОГАМИ ===
-    color_op = "lightgreen" if percent_op_total >= 1 else "lightcoral"
-    color_vp = "lightgreen" if percent_vp_total >= 1 else "lightcoral"
+    # === ЗАГОЛОВОК С ИТОГАМИ В СТРОКУ + ЗАЛИВКА ===
+    color_op = "lightgreen" if percent_op_total is not None and percent_op_total >= 1 else "lightcoral"
+    color_vp = "lightgreen" if percent_vp_total is not None and percent_vp_total >= 1 else "lightcoral"
 
     summary_html = f"""
         <div style="font-weight:bold; margin-top:1em;">
             Итоги: &nbsp;
-            ОП Факт: {total_op:,.2f} &nbsp; | &nbsp;
-            ОП План: {total_op_plan:,.2f} &nbsp; | &nbsp;
+            ОП Факт: {safe_number(total_op)} &nbsp; | &nbsp;
+            ОП План: {safe_number(total_op_plan)} &nbsp; | &nbsp;
             <span style="background-color:{color_op}; padding: 2px 6px; border-radius: 4px;">
-                % ОП: {percent_op_total:.0%}
+                % ОП: {safe_percent(percent_op_total)}
             </span> &nbsp; | &nbsp;
-            ВП Факт: {total_vp:,.2f} &nbsp; | &nbsp;
-            ВП План: {total_vp_plan:,.2f} &nbsp; | &nbsp;
+            ВП Факт: {safe_number(total_vp)} &nbsp; | &nbsp;
+            ВП План: {safe_number(total_vp_plan)} &nbsp; | &nbsp;
             <span style="background-color:{color_vp}; padding: 2px 6px; border-radius: 4px;">
-                % ВП: {percent_vp_total:.0%}
+                % ВП: {safe_percent(percent_vp_total)}
             </span> &nbsp; | &nbsp;
-            ОП_ПГ: {total_pg:,.2f}
+            ОП_ПГ: {safe_number(total_pg)}
         </div>
     """
 
     st.subheader("📋 Результаты на 04.06.2025")
     st.markdown(summary_html, unsafe_allow_html=True)
 
-    # === СТИЛИЗАЦИЯ И РЕНДЕР HTML ===
-    try:
-        styled_html = df_result.style \
-            .format({
-                "ОП Факт": "{:,.2f}",
-                "ОП План": "{:,.2f}",
-                "% ОП": "{:.0%}",
-                "ВП Факт": "{:,.2f}",
-                "ВП План": "{:,.2f}",
-                "% ВП": "{:.0%}",
-                "ОП_ПГ": "{:,.2f}"
-            }) \
-            .apply(highlight_percent_cols, axis=None) \
-            .to_html(escape=False)
+    styled_html = df_result.style \
+        .format({
+            "ОП Факт": safe_number,
+            "ОП План": safe_number,
+            "% ОП": safe_percent,
+            "ВП Факт": safe_number,
+            "ВП План": safe_number,
+            "% ВП": safe_percent,
+            "ОП_ПГ": safe_number
+        }) \
+        .apply(highlight_percent_cols, axis=None) \
+        .to_html()
 
-        st.markdown(f"""
-            <div class="scrollable-table-container">
-                {styled_html}
-            </div>
-        """, unsafe_allow_html=True)
-    except Exception as e:
-        st.error("⚠️ Не удалось отобразить таблицу с форматированием. Ошибка: " + str(e))
-        st.dataframe(df_result)
+    st.markdown(f"""
+        <div class="scrollable-table-container">
+            {styled_html}
+        </div>
+    """, unsafe_allow_html=True)
 
 else:
     st.warning("⚠️ Нет данных для отображения — проверьте настройки фильтрации.")
