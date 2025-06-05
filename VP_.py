@@ -146,8 +146,9 @@ if not filtered_df.empty:
     df_result = pd.concat([df_result, pd.DataFrame([totals])], ignore_index=True)
 
     # === ЗАГОЛОВОК С ИТОГАМИ В СТРОКУ + ЗАЛИВКА ===
-    color_op = "lightgreen" if percent_op_total >= 1 else "lightcoral"
-    color_vp = "lightgreen" if percent_vp_total >= 1 else "lightcoral"
+color_op = "lightgreen" if percent_op_total is not None and percent_op_total >= 1 else "lightcoral"
+color_vp = "lightgreen" if percent_vp_total is not None and percent_vp_total >= 1 else "lightcoral"
+
 
     summary_html = f"""
         <div style="font-weight:bold; margin-top:1em;">
