@@ -169,7 +169,7 @@ if not filtered_df.empty:
         </div>
     """
 
-    st.subheader("📋 Результаты на 08.06.2025")
+    st.subheader("📋 Результаты на 09.06.2025")
     st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
