@@ -71,58 +71,32 @@ df = load_data()
 # === ФИЛЬТРЫ ===
 st.sidebar.header("🔎 Фильтрация")
 
-# Новая улучшенная версия multiselect_with_all
 def multiselect_with_all(label, options):
     all_label = "Все"
-    empty_label = "Пусто"
-    extended_options = [all_label] + options + [empty_label]
-    selected = st.sidebar.multiselect(label, extended_options, default=all_label)
-    include_empty = empty_label in selected
-    selected_values = options if all_label in selected else [v for v in selected if v != empty_label]
-    return selected_values, include_empty
+    selected = st.sidebar.multiselect(label, [all_label] + options, default=all_label)
+    return options if all_label in selected else selected
 
 filtered_df = df.copy()
 
-# === ФИЛЬТР: РЕГИОН ===
 if "Регион" in filtered_df.columns:
-    regions = sorted(filtered_df["Регион"].dropna().astype(str).str.strip().unique())
-    region_selection, include_empty_region = multiselect_with_all("Регион", regions)
-    filtered_df = filtered_df[
-        filtered_df["Регион"].astype(str).str.strip().isin(region_selection) |
-        (filtered_df["Регион"].isna() if include_empty_region else False) |
-        ((filtered_df["Регион"].astype(str).str.strip() == "") if include_empty_region else False)
-    ]
+    regions = sorted(filtered_df["Регион"].dropna().unique())
+    region_selection = multiselect_with_all("Регион", regions)
+    filtered_df = filtered_df[filtered_df["Регион"].isin(region_selection)]
 
-# === ФИЛЬТР: МЕНЕДЖЕР ===
 if "Менеджер" in filtered_df.columns:
-    managers = sorted(filtered_df["Менеджер"].dropna().astype(str).str.strip().unique())
-    manager_selection, include_empty_manager = multiselect_with_all("Менеджер", managers)
-    filtered_df = filtered_df[
-        filtered_df["Менеджер"].astype(str).str.strip().isin(manager_selection) |
-        (filtered_df["Менеджер"].isna() if include_empty_manager else False) |
-        ((filtered_df["Менеджер"].astype(str).str.strip() == "") if include_empty_manager else False)
-    ]
+    managers = sorted(filtered_df["Менеджер"].dropna().unique())
+    manager_selection = multiselect_with_all("Менеджер", managers)
+    filtered_df = filtered_df[filtered_df["Менеджер"].isin(manager_selection)]
 
-# === ФИЛЬТР: ДОБАВИТЬ В ПЛАН ===
 if "Добавить в план" in filtered_df.columns:
-    plans = sorted(filtered_df["Добавить в план"].dropna().astype(str).str.strip().unique())
-    plan_selection, include_empty_plan = multiselect_with_all("Добавить в план", plans)
-    filtered_df = filtered_df[
-        filtered_df["Добавить в план"].astype(str).str.strip().isin(plan_selection) |
-        (filtered_df["Добавить в план"].isna() if include_empty_plan else False) |
-        ((filtered_df["Добавить в план"].astype(str).str.strip() == "") if include_empty_plan else False)
-    ]
+    plans = sorted(filtered_df["Добавить в план"].dropna().unique())
+    plan_selection = multiselect_with_all("Добавить в план", plans)
+    filtered_df = filtered_df[filtered_df["Добавить в план"].isin(plan_selection)]
 
-# === ФИЛЬТР: ПОКУПАТЕЛЬ ===
 if "Покупатель" in filtered_df.columns:
-    buyers = sorted(filtered_df["Покупатель"].dropna().astype(str).str.strip().unique())
-    buyer_selection, include_empty_buyer = multiselect_with_all("Покупатель", buyers)
-    filtered_df = filtered_df[
-        filtered_df["Покупатель"].astype(str).str.strip().isin(buyer_selection) |
-        (filtered_df["Покупатель"].isna() if include_empty_buyer else False) |
-        ((filtered_df["Покупатель"].astype(str).str.strip() == "") if include_empty_buyer else False)
-    ]
-
+    buyers = sorted(filtered_df["Покупатель"].dropna().unique())
+    buyer_selection = multiselect_with_all("Покупатель", buyers)
+    filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
 # === ПОДСВЕТКА ПРОЦЕНТОВ ===
 def highlight_percent_cols(df):
