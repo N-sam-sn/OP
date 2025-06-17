@@ -23,10 +23,8 @@ def load_data():
             df[col] = df[col].apply(clean_number)
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    df = df[
-        (df["ОП"] > 0) |
-        (df["ОП План"] > 0) |
-        (df["ВП"] > 0) |
+    df = df[        
+        (df["ОП План"] > 0) |        
         (df["ВП План"] > 0)
     ].copy()
 
