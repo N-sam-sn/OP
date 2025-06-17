@@ -132,7 +132,7 @@ def safe_number(x):
 
 # === ТАБЛИЦА ===
 if not filtered_df.empty:
-    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
+    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ","Добавить в план","Регион"]
     df_result = filtered_df[display_columns].copy()
     df_result.rename(columns={"ОП": "ОП Факт", "ВП": "ВП Факт"}, inplace=True)
 
