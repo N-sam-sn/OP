@@ -19,8 +19,8 @@ def load_data():
         return str(x).replace(" ", "").replace(",", ".").replace("–", "0").strip()
 
     def clean(x):
-        if pd.isna(x):
-            return None
+        if pd.empty::
+            return "-"
         return str(x).replace("", "-").strip()
 
     for col in ["ОП", "ОП План", "ВП", "ВП План", "ОП_ПГ"]:
@@ -28,8 +28,8 @@ def load_data():
             df[col] = df[col].apply(clean_number)
             df[col] = pd.to_numeric(df[col], errors="coerce")
     #for col in ["Менеджер", "Покупатель"]:
-    #    if col in df.columns:
-    #        df[col] = df[col].apply(clean)
+       if col in df.columns:
+           df[col] = df[col].apply(clean)
             
 
     df = df[        
