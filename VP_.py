@@ -179,7 +179,7 @@ if not filtered_df.empty:
     summary_html = f"""
         <div style="font-weight:bold; margin-top:1em;">
             Итоги: &nbsp;
-            ОП Факт: {safe_number(total_op)} &nbsp; | &nbsp;
+            ОП Факт:999 {safe_number(total_op)} &nbsp; | &nbsp;
             ОП План: {safe_number(total_op_plan)} &nbsp; | &nbsp;
             <span style="background-color:{color_op}; padding: 2px 6px; border-radius: 4px;">
                 % ОП: {safe_percent(percent_op_total)}
