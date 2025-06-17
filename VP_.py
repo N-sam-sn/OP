@@ -129,7 +129,7 @@ def safe_number(x):
     return "{:,.2f}".format(x) if pd.notna(x) else ""
 
 # === ТАБЛИЦА ===
-#if not filtered_df.empty:
+if not filtered_df.empty:
     display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ"]
     df_result = filtered_df[display_columns].copy()
     df_result.rename(columns={"ОП": "ОП Факт", "ВП": "ВП Факт"}, inplace=True)
