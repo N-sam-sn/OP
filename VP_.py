@@ -78,10 +78,8 @@ def multiselect_with_all(label, options):
 
 filtered_df = df.copy()
 
-if "Отдел" in filtered_df.columns:
-    departments = sorted(filtered_df["Отдел"].dropna().unique())
-    department_selection = multiselect_with_all("Отдел", departments)
-    filtered_df = filtered_df[filtered_df["Отдел"].isin(department_selection)]
+
+    
 if "Регион" in filtered_df.columns:
     regions = sorted(filtered_df["Регион"].dropna().unique())
     region_selection = multiselect_with_all("Регион", regions)
@@ -102,11 +100,6 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
-
-if "Канал" in filtered_df.columns:
-    channels = sorted(filtered_df["Канал"].dropna().unique())
-    channel_selection = multiselect_with_all("Канал", channels)
-    filtered_df = filtered_df[filtered_df["Канал"].isin(channel_selection)]
 
 
 # === ПОДСВЕТКА ПРОЦЕНТОВ ===
