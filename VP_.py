@@ -28,7 +28,7 @@ def load_data():
         if col in df.columns:
             df[col] = df[col].apply(clean_number)
             df[col] = pd.to_numeric(df[col], errors="coerce")
-    for col in ["Менеджер", "Покупатель","Регион","Добавить в план"]:
+    for col in ["Менеджер", "Покупатель","Регион","Добавить в план","Отдел","Канал"]:
         if col in df.columns:
             df[col] = df[col].apply(clean)
 
@@ -88,6 +88,10 @@ def multiselect_with_all(label, options):
 filtered_df = df.copy()
 
 
+if "Отдел" in filtered_df.columns:
+    departments = sorted(filtered_df["Отдел"].dropna().unique())
+    department_selection = multiselect_with_all("Отдел", departments)
+    filtered_df = filtered_df[filtered_df["Отдел"].isin(department_selection)]
     
 if "Регион" in filtered_df.columns:
     regions = sorted(filtered_df["Регион"].dropna().unique())
@@ -109,6 +113,11 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
+
+if "Канал" in filtered_df.columns:
+    channels = sorted(filtered_df["Канал"].dropna().unique())
+    channel_selection = multiselect_with_all("Канал", channels)
+    filtered_df = filtered_df[filtered_df["Канал"].isin(channel_selection)]
 
 
 # === ПОДСВЕТКА ПРОЦЕНТОВ ===
@@ -132,7 +141,7 @@ def safe_number(x):
 
 # === ТАБЛИЦА ===
 if not filtered_df.empty:
-    display_columns = ["Менеджер", "Покупатель", "Код", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ","Добавить в план","Регион"]
+    display_columns = ["Менеджер", "Покупатель", "ОП", "ОП План", "% ОП", "ВП", "ВП План", "% ВП", "ОП_ПГ","Добавить в план","Регион","Отдел","Канал"]
     df_result = filtered_df[display_columns].copy()
     df_result.rename(columns={"ОП": "ОП Факт", "ВП": "ВП Факт"}, inplace=True)
 
