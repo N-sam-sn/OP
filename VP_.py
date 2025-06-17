@@ -18,7 +18,7 @@ def load_data():
             return None
         return str(x).replace(" ", "").replace(",", ".").replace("–", "0").strip()
 
-    for col in ["ОП", "ОП План", "ВП", "ВП План", "ОП_ПГ"]:
+    for col in ["ОП", "ОП План", "ВП", "ВП План", "ОП_ПГ", "Менеджер", "Покупатель"]:
         if col in df.columns:
             df[col] = df[col].apply(clean_number)
             df[col] = pd.to_numeric(df[col], errors="coerce")
