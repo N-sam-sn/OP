@@ -139,7 +139,7 @@ def safe_percent(x):
     return "{:.0%}".format(x) if pd.notna(x) else ""
 
 def safe_number(x):
-    return "{:,.2f}".format(x) if pd.notna(x) else ""
+    return "{:,.0f}".format(x) if pd.notna(x) else ""
 
 # === ТАБЛИЦА ===
 if not filtered_df.empty:
