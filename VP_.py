@@ -38,7 +38,7 @@ def load_data():
         (df["ОП План"] != 0) |
         (df["ОП"] != 0) |
         (df["ВП"] != 0) |        
-         (df["ВП План"] <> 0)
+         (df["ВП План"] != 0)
     ].copy()
 
     df["% ОП"] = df.apply(lambda row: row["ОП"] / row["ОП План"] if row["ОП План"] else None, axis=1)
