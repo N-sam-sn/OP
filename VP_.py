@@ -98,6 +98,17 @@ if "Покупатель" in filtered_df.columns:
     buyer_selection = multiselect_with_all("Покупатель", buyers)
     filtered_df = filtered_df[filtered_df["Покупатель"].isin(buyer_selection)]
 
+if "Отдел" in filtered_df.columns:
+    departments = sorted(filtered_df["Отдел"].dropna().unique())
+    department_selection = multiselect_with_all("Отдел", departments)
+    filtered_df = filtered_df[filtered_df["Отдел"].isin(department_selection)]
+
+if "Канал" in filtered_df.columns:
+    channels = sorted(filtered_df["Канал"].dropna().unique())
+    channel_selection = multiselect_with_all("Канал", channels)
+    filtered_df = filtered_df[filtered_df["Канал"].isin(channel_selection)]
+
+
 # === ПОДСВЕТКА ПРОЦЕНТОВ ===
 def highlight_percent_cols(df):
     styles = pd.DataFrame("", index=df.index, columns=df.columns)
