@@ -19,17 +19,19 @@ def load_data():
         return str(x).replace(" ", "").replace(",", ".").replace("–", "0").strip()
 
     def clean(x):
-        if pd.empty:
+        if pd.isna(x) or str(x).strip() == "":
             return "-"
-        return str(x).replace("", "-").strip()
+        return str(x).strip()
+
 
     for col in ["ОП", "ОП План", "ВП", "ВП План", "ОП_ПГ"]:
         if col in df.columns:
             df[col] = df[col].apply(clean_number)
             df[col] = pd.to_numeric(df[col], errors="coerce")
-    for col in ["Менеджер", "Покупатель"]:
-       if col in df.columns:
-           df[col] = df[col].apply(clean)
+for col in ["Менеджер", "Покупатель"]:
+    if col in df.columns:
+        df[col] = df[col].apply(clean)
+
             
 
     df = df[        
