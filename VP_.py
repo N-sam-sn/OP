@@ -19,7 +19,7 @@ def load_data():
         return str(x).replace(" ", "").replace(",", ".").replace("–", "0").strip()
 
     def clean(x):
-        if pd.empty::
+        if pd.empty:
             return "-"
         return str(x).replace("", "-").strip()
 
