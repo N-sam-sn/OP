@@ -28,7 +28,7 @@ def load_data():
         if col in df.columns:
             df[col] = df[col].apply(clean_number)
             df[col] = pd.to_numeric(df[col], errors="coerce")
-    for col in ["Менеджер", "Покупатель","Регион","Добавить в план","Отдел","Канал"]:
+    for col in ["Менеджер", "Покупатель","Регион","Добавить в план","Отдел","Канал","ИНН"]:
         if col in df.columns:
             df[col] = df[col].apply(clean)
 
