@@ -105,15 +105,15 @@ if "Регион" in filtered_df.columns:
     region_selection = multiselect_with_all("Регион", regions)
     filtered_df = filtered_df[filtered_df["Регион"].isin(region_selection)]
 
-if "Менеджер" in filtered_df.columns:
-    managers = sorted(filtered_df["Менеджер"].dropna().unique())
-    manager_selection = multiselect_with_all("Менеджер", managers)
-    filtered_df = filtered_df[filtered_df["Менеджер"].isin(manager_selection)]
-
 if "Добавить в план" in filtered_df.columns:
     plans = sorted(filtered_df["Добавить в план"].dropna().unique())
     plan_selection = multiselect_with_all("Добавить в план", plans)
     filtered_df = filtered_df[filtered_df["Добавить в план"].isin(plan_selection)]
+
+if "Менеджер" in filtered_df.columns:
+    managers = sorted(filtered_df["Менеджер"].dropna().unique())
+    manager_selection = multiselect_with_all("Менеджер", managers)
+    filtered_df = filtered_df[filtered_df["Менеджер"].isin(manager_selection)]
 
 if "Покупатель" in filtered_df.columns:
     buyers = sorted(filtered_df["Покупатель"].dropna().unique())
