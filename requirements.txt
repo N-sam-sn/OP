@@ -1,6 +1,3 @@
 pandas
 plotly
 streamlit
-python-3.10
-
-
