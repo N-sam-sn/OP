@@ -74,13 +74,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === ЗАГОЛОВОК ===
-st.title("📊 Дашборд по продажам февраля 2026")
+st.title("Дашборд по продажам февраля 2026")
 
 # === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
 
 # === ФИЛЬТРЫ ===
-st.sidebar.header("🔎 Фильтрация")
+st.sidebar.header("Фильтрация")
 
 def multiselect_with_all(label, options):
     all_label = "Все"
@@ -193,7 +193,7 @@ if not filtered_df.empty:
         </div>
     """
 
-    st.subheader("📋 Результаты на 16.02.2026")
+    st.subheader("Результаты на 17.02.2026")
     st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
@@ -217,6 +217,7 @@ if not filtered_df.empty:
 
 else:
     st.warning("⚠️ Нет данных для отображения — проверьте настройки фильтрации.")
+
 
 
 
