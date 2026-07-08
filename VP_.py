@@ -74,7 +74,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === ЗАГОЛОВОК ===
-st.title("Дашборд по продажам июня 2026")
+st.title("Дашборд по продажам июля 2026")
 
 # === ЗАГРУЗКА ДАННЫХ ===
 df = load_data()
@@ -193,7 +193,7 @@ if not filtered_df.empty:
         </div>
     """
 
-    st.subheader("Результаты на 30.06.2026")
+    st.subheader("Результаты на 07.07.2026")
     st.markdown(summary_html, unsafe_allow_html=True)
 
     styled_html = df_result.style \
